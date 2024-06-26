@@ -22,9 +22,20 @@ interface ICurrentWeatherData {
   dt: number
   name: string
 }
-
+interface IWeatherRequest {
+  q?: string
+  zip?: number
+  lat?: string
+  lon?: string
+  appid: string
+}
+interface Coordinates {
+  latitude: number
+  longitude: number
+}
 export interface IWeatherService {
   getCurrentWeather(city: string, country: string): Observable<ICurrentWeather>
+  getCurrentWeatherByCoords(coords: Coordinates): Observable<ICurrentWeather>
 }
 
 @Injectable({
@@ -33,11 +44,36 @@ export interface IWeatherService {
 export class WeatherService implements IWeatherService {
   constructor(private httpClient: HttpClient) {}
 
-  getCurrentWeather(city: string, country: string): Observable<ICurrentWeather> {
-    const uriParams = new HttpParams()
-      .set('q', `${city},${country}`)
-      .set('appid', environment.appId)
-
+  getCurrentWeather(
+    search: string | number,
+    country?: string
+  ): Observable<ICurrentWeather> {
+    let request: Omit<IWeatherRequest, 'appid'>
+    if (typeof search === 'string') {
+      request = { q: country !== undefined ? `${search},${country}` : search }
+    } else {
+      request = { zip: search }
+    }
+    return this.getCurrentWeatherHelper(request)
+  }
+  getCurrentWeatherByCoords(coords: Coordinates): Observable<ICurrentWeather> {
+    const request = {
+      lat: coords.latitude.toString(),
+      lon: coords.longitude.toString(),
+    }
+    return this.getCurrentWeatherHelper(request)
+  }
+  private getCurrentWeatherHelper(
+    request: Omit<IWeatherRequest, 'appid'>
+  ): Observable<ICurrentWeather> {
+    const apiRequest = { appid: environment.appId, ...request }
+    const uriParams = (Object.keys(apiRequest) as (keyof IWeatherRequest)[]).reduce(
+      (uriParams, param) => {
+        const req = apiRequest[param]
+        return req !== undefined ? uriParams.set(param, req) : uriParams
+      },
+      new HttpParams()
+    )
     return this.httpClient
       .get<ICurrentWeatherData>(
         `${environment.baseUrl}api.openweathermap.org/data/2.5/weather`,
@@ -45,7 +81,6 @@ export class WeatherService implements IWeatherService {
       )
       .pipe(map((data) => this.transformToICurrentWeather(data)))
   }
-
   private transformToICurrentWeather(data: ICurrentWeatherData): ICurrentWeather {
     return {
       city: data.name,
