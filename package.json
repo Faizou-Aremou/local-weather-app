@@ -13,6 +13,7 @@
     "style:fix": "prettier --write \"**/{src,tests,e2e}/**/*.{*css,ts,html}\"",
     "style": "prettier --check \"**/{src,tests,e2e}/**/*.{*css,ts,html}\"",
     "start": "ng serve",
+    "start:stage5": "ng serve stage5",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test local-weather-app",
