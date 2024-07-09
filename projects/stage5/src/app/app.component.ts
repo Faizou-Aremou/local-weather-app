@@ -5,6 +5,9 @@ import { FlexModule } from '@ngbracket/ngx-layout/flex'
 
 import { CurrentWeatherComponent } from './current-weather/current-weather.component'
 import { CitySearchComponent } from './city-search/city-search.component'
+import { ICurrentWeather } from './interfaces'
+import { WeatherService } from './weather/weather.service'
+import { first } from 'rxjs'
 
 @Component({
   selector: 'app-root',
@@ -17,7 +20,7 @@ import { CitySearchComponent } from './city-search/city-search.component'
         <div class="mat-caption v-pad">Your city, your forecast, right now!</div>
       </div>
       <div fxLayoutAlign="center">
-        <app-city-search />
+        <app-city-search (searchEvent)="doSearch($event)" />
       </div>
       <div fxLayout="row">
         <div fxFlex></div>
@@ -28,7 +31,7 @@ import { CitySearchComponent } from './city-search/city-search.component'
             </mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <app-current-weather></app-current-weather>
+            <app-current-weather [current]="currentWeather"></app-current-weather>
           </mat-card-content>
         </mat-card>
         <div fxFlex></div>
@@ -44,4 +47,14 @@ import { CitySearchComponent } from './city-search/city-search.component'
     CitySearchComponent,
   ],
 })
-export class AppComponent {}
+export class AppComponent {
+  currentWeather!: ICurrentWeather
+  constructor(private weatherService: WeatherService) {}
+  doSearch(searchValue: string) {
+    const userInput = searchValue.split(',').map((s) => s.trim())
+    this.weatherService
+      .getCurrentWeather(userInput[0], userInput.length > 1 ? userInput[1] : undefined)
+      .pipe(first())
+      .subscribe((data) => (this.currentWeather = data))
+  }
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, EventEmitter, OnInit, Output } from '@angular/core'
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatIcon } from '@angular/material/icon'
@@ -22,23 +22,24 @@ import { ErrorMinLengthPipe } from './error-min-length.pipe'
   styleUrl: './city-search.component.css',
 })
 export class CitySearchComponent implements OnInit {
+  @Output() searchEvent = new EventEmitter<string>()
   search = new FormControl<string>('', [Validators.minLength(2)])
   constructor(private weatherService: WeatherService) {}
 
   ngOnInit(): void {
     this.search.valueChanges
-      .pipe(debounceTime(1000))
+      .pipe(debounceTime(250))
       .pipe(
         filter((value: null | string): value is string => value !== null),
-        filter((value) => this.search.valid),
-        switchMap((searchValue) => {
-          const userInput = searchValue.split(',').map((s) => s.trim())
-          return this.weatherService.getCurrentWeather(
-            userInput[0],
-            userInput.length > 1 ? userInput[1] : undefined
-          )
-        })
+        filter((value) => this.search.valid)
+        // switchMap((searchValue) => {
+        //   const userInput = searchValue.split(',').map((s) => s.trim())
+        //   return this.weatherService.getCurrentWeather(
+        //     userInput[0],
+        //     userInput.length > 1 ? userInput[1] : undefined
+        //   )
+        // })
       )
-      .subscribe()
+      .subscribe((value) => this.searchEvent.next(value))
   }
 }

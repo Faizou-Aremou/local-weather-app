@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common'
-import { Component, OnInit } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core'
 import { FlexModule } from '@ngbracket/ngx-layout/flex'
 
 import { ICurrentWeather } from '../interfaces'
@@ -12,15 +12,16 @@ import { WeatherService } from '../weather/weather.service'
   standalone: true,
   imports: [FlexModule, DecimalPipe, DatePipe],
 })
-export class CurrentWeatherComponent implements OnInit {
+export class CurrentWeatherComponent {
+  @Input() current!: ICurrentWeather
   constructor(private weatherService: WeatherService) {}
-  current!: ICurrentWeather
+  //current!: ICurrentWeather
 
-  ngOnInit(): void {
-    this.weatherService
-      .getCurrentWeather('Bethesda', 'US')
-      .subscribe((data) => (this.current = data))
-  }
+  // ngOnInit(): void {
+  //   this.weatherService
+  //     .getCurrentWeather('Bethesda', 'US')
+  //     .subscribe((data) => (this.current = data))
+  // }
 
   getOrdinal(date: number) {
     const n = new Date(date).getDate()
