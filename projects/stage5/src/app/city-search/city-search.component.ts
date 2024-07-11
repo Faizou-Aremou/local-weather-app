@@ -3,7 +3,7 @@ import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatIcon } from '@angular/material/icon'
 import { MatInputModule } from '@angular/material/input'
-import { debounceTime, filter, switchMap } from 'rxjs'
+import { Observable, Subject, debounceTime, filter, switchMap } from 'rxjs'
 import { WeatherService } from '../weather/weather.service'
 import { ErrorMinLengthPipe } from './error-min-length.pipe'
 
@@ -31,15 +31,14 @@ export class CitySearchComponent implements OnInit {
       .pipe(debounceTime(250))
       .pipe(
         filter((value: null | string): value is string => value !== null),
-        filter((value) => this.search.valid)
-        // switchMap((searchValue) => {
-        //   const userInput = searchValue.split(',').map((s) => s.trim())
-        //   return this.weatherService.getCurrentWeather(
-        //     userInput[0],
-        //     userInput.length > 1 ? userInput[1] : undefined
-        //   )
-        // })
+        filter(() => this.search.valid)
       )
-      .subscribe((value) => this.searchEvent.next(value))
+      .subscribe((searchValue) => {
+        const userInput = searchValue.split(',').map((s) => s.trim())
+        this.weatherService.updateCurrentWeather(
+          userInput[0],
+          userInput.length > 1 ? userInput[1] : undefined
+        )
+      })
   }
 }

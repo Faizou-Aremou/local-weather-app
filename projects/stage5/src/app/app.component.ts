@@ -20,7 +20,7 @@ import { first } from 'rxjs'
         <div class="mat-caption v-pad">Your city, your forecast, right now!</div>
       </div>
       <div fxLayoutAlign="center">
-        <app-city-search (searchEvent)="doSearch($event)" />
+        <app-city-search />
       </div>
       <div fxLayout="row">
         <div fxFlex></div>
@@ -31,7 +31,7 @@ import { first } from 'rxjs'
             </mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <app-current-weather [current]="currentWeather"></app-current-weather>
+            <app-current-weather></app-current-weather>
           </mat-card-content>
         </mat-card>
         <div fxFlex></div>
@@ -47,14 +47,4 @@ import { first } from 'rxjs'
     CitySearchComponent,
   ],
 })
-export class AppComponent {
-  currentWeather!: ICurrentWeather
-  constructor(private weatherService: WeatherService) {}
-  doSearch(searchValue: string) {
-    const userInput = searchValue.split(',').map((s) => s.trim())
-    this.weatherService
-      .getCurrentWeather(userInput[0], userInput.length > 1 ? userInput[1] : undefined)
-      .pipe(first())
-      .subscribe((data) => (this.currentWeather = data))
-  }
-}
+export class AppComponent {}
