@@ -13,15 +13,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
   standalone: true,
   imports: [FlexModule, DecimalPipe, DatePipe, CommonModule],
 })
-export class CurrentWeatherComponent implements OnInit {
+export class CurrentWeatherComponent {
   current$: Observable<ICurrentWeather> | undefined
-  constructor(private weatherService: WeatherService) {}
-
-  current!: ICurrentWeather
-
-  ngOnInit(): void {
+  constructor(private weatherService: WeatherService) {
     this.current$ = this.weatherService.currentWeather$
   }
+
+  current!: ICurrentWeather
 
   getOrdinal(date: number) {
     const n = new Date(date).getDate()
