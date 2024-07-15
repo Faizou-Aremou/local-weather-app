@@ -4,7 +4,7 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatIcon } from '@angular/material/icon'
 import { MatInputModule } from '@angular/material/input'
 import { debounceTime, filter, tap } from 'rxjs'
-import { WeatherService } from '../weather/weather.service'
+import { IPostalCodeService, WeatherService } from '../weather/weather.service'
 import { ErrorMinLengthPipe } from './error-min-length.pipe'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
@@ -19,6 +19,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
     MatIcon,
     ErrorMinLengthPipe,
   ],
+
   templateUrl: './city-search.component.html',
   styleUrl: './city-search.component.css',
 })
