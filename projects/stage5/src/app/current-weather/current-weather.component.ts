@@ -1,10 +1,8 @@
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common'
-import { Component, DestroyRef, Input, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, WritableSignal } from '@angular/core'
 import { FlexModule } from '@ngbracket/ngx-layout/flex'
 import { ICurrentWeather } from '../interfaces'
 import { WeatherService } from '../weather/weather.service'
-import { Observable, Subject, takeUntil } from 'rxjs'
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
 @Component({
   selector: 'app-current-weather',
@@ -14,13 +12,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
   imports: [FlexModule, DecimalPipe, DatePipe, CommonModule],
 })
 export class CurrentWeatherComponent {
-  current$: Observable<ICurrentWeather> | undefined
+  readonly current: WritableSignal<ICurrentWeather>
   constructor(private weatherService: WeatherService) {
-    this.current$ = this.weatherService.currentWeather$
+    this.current = this.weatherService.currentWeather
   }
-
-  current!: ICurrentWeather
-
   getOrdinal(date: number) {
     const n = new Date(date).getDate()
     return n > 0

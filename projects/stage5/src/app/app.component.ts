@@ -1,19 +1,21 @@
-import { Component } from '@angular/core'
+import { Component, effect, signal } from '@angular/core'
 import { MatCardModule } from '@angular/material/card'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { FlexModule } from '@ngbracket/ngx-layout/flex'
 import { CitySearchComponent } from './city-search/city-search.component'
 import { CurrentWeatherComponent } from './current-weather/current-weather.component'
-import { PostalCodeAPIService } from './postal-code-api.service'
-import { PostalCodeAPI, PostalCodeService } from './postal-code.service'
-import { IPostalCodeService } from './weather/weather.service'
+import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox'
 
+const darkClassName = 'dark-theme'
 @Component({
   selector: 'app-root',
   template: `
     <div>
       <mat-toolbar color="primary">
         <span data-testid="title">LocalCast Weather</span>
+        <mat-checkbox [checked]="toggleState()" (change)="changeDarkMode($event)"
+          >dark mode</mat-checkbox
+        >
       </mat-toolbar>
       <div fxLayoutAlign="center">
         <div class="mat-caption v-pad">Your city, your forecast, right now!</div>
@@ -44,6 +46,20 @@ import { IPostalCodeService } from './weather/weather.service'
     MatToolbarModule,
     MatCardModule,
     CitySearchComponent,
+    MatCheckboxModule,
   ],
 })
-export class AppComponent {}
+export class AppComponent {
+  readonly toggleState = signal(localStorage.getItem(darkClassName) === 'true')
+  constructor() {
+    effect(() => {
+      localStorage.setItem(darkClassName, this.toggleState().toString())
+    })
+    effect(() => {
+      document.documentElement.classList.toggle(darkClassName, this.toggleState())
+    })
+  }
+  changeDarkMode(event: MatCheckboxChange) {
+    this.toggleState.set(event.checked)
+  }
+}
