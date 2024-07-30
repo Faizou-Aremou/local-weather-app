@@ -6,6 +6,8 @@ import { of } from 'rxjs'
 import { WeatherService } from '../weather/weather.service'
 import { fakeWeather } from '../weather/weather.service.fake'
 import { CurrentWeatherComponent } from './current-weather.component'
+import { signal } from '@angular/core'
+import { ICurrentWeather } from '../interfaces'
 
 describe('CurrentWeatherComponent', () => {
   let component: CurrentWeatherComponent
@@ -13,9 +15,10 @@ describe('CurrentWeatherComponent', () => {
   let weatherServiceMock: jasmine.SpyObj<WeatherService>
 
   beforeEach(waitForAsync(() => {
-    const weatherServiceSpy = jasmine.createSpyObj('WeatherService', [
-      'getCurrentWeather',
-    ])
+    const weatherServiceSpy = jasmine.createSpyObj('WeatherService', {
+      getCurrentWeather: of(fakeWeather),
+      currentWeather: signal(fakeWeather),
+    })
 
     TestBed.configureTestingModule({
       imports: [CurrentWeatherComponent],
@@ -34,7 +37,6 @@ describe('CurrentWeatherComponent', () => {
   it('should create', () => {
     // Arrange
     weatherServiceMock.getCurrentWeather.and.returnValue(of())
-
     // Act
     fixture.detectChanges() // triggers ngOnInit
 
@@ -56,14 +58,14 @@ describe('CurrentWeatherComponent', () => {
   it('should eagerly load currentWeather in Bethesda from weatherService', () => {
     // Arrange
     weatherServiceMock.getCurrentWeather.and.returnValue(of(fakeWeather))
-
+    weatherServiceMock.currentWeather
     // Act
     fixture.detectChanges() // triggers ngOnInit()
 
     // Assert
-    expect(component.current).toBeDefined()
-    expect(component.current.city).toEqual('Bethesda')
-    expect(component.current.temperature).toEqual(280.32)
+    expect(component.current()).toBeDefined()
+    expect(component.current().city).toEqual('Bethesda')
+    expect(component.current().temperature).toEqual(280.32)
 
     // Assert on DOM
     const debugEl = fixture.debugElement

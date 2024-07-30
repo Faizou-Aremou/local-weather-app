@@ -4,11 +4,26 @@ import { MockComponents } from 'ng-mocks'
 
 import { AppComponent } from './app.component'
 import { CurrentWeatherComponent } from './current-weather/current-weather.component'
+import { IPostalCodeService } from './weather/weather.service'
+import { PostalCodeAPI, PostalCodeService } from './postal-code.service'
+import { PostalCodeAPIService } from './postal-code-api.service'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 
 describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [AppComponent, ...MockComponents(CurrentWeatherComponent)],
+      imports: [
+        AppComponent,
+        ...MockComponents(CurrentWeatherComponent),
+        HttpClientTestingModule,
+      ],
+      providers: [
+        { provide: IPostalCodeService, useClass: PostalCodeService },
+        {
+          provide: PostalCodeAPI,
+          useClass: PostalCodeAPIService,
+        },
+      ],
     }).compileComponents()
   }))
 
